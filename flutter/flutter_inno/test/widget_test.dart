@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:camera/camera.dart'; // Import the camera package
+import 'package:camera/camera.dart'; // Import CameraDescription from camera.dart
 
 import 'package:flutter_inno/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Get a list of available cameras
-    final cameras = await availableCameras();
-
-    // Define a dummy CameraDescription instance
+    // Create a dummy CameraDescription for testing
     final dummyCamera = CameraDescription(
-      name: 'dummy_camera', // Provide a name for the dummy camera
-      lensDirection: CameraLensDirection.front, // Choose a lens direction
-      sensorOrientation: 0, // Provide a dummy sensor orientation value
+      name: 'dummy_camera',
+      lensDirection: CameraLensDirection.front,
+      sensorOrientation: 0,
     );
 
     // Build our app and trigger a frame.
-    // Pass the first camera in the list as the dummy camera
-    await tester.pumpWidget(MyApp(camera: cameras.first));
+    await tester.pumpWidget(MyApp(camera: dummyCamera));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
