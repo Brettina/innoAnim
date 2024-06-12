@@ -1,7 +1,7 @@
-String erste(){
+String erste() {
   return "hll";
 }
 
-void start_engine(){
+void Start_engine() {
   print("start engine");
 }
