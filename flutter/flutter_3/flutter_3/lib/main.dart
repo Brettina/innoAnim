@@ -2,13 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
+import 'dart:convert';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
   final firstCamera = cameras.first;
+  runApp(MyApp());
 
   runApp(MainApp(camera: firstCamera));
+}
+
+class MyApp extends StatelessWidget {
+  final String baseUrl = 'http://127.0.0.1:9102';
+
+  Future<void> startVideo(String path) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/start_video'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'path': path,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Video started successfully');
+    } else {
+      print('Failed to start video: ${response.body}');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text('Start Video App')),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              startVideo(
+                  'assets/probeboogy.mp4'); // Change this to the actual path
+            },
+            child: Text('Start Video'),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MainApp extends StatefulWidget {

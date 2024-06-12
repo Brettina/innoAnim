@@ -1,115 +1,46 @@
 import 'package:flutter/material.dart';
-import 'functionsextra.dart';
-import 'package:camera/camera.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
-  runApp(MainApp());
+  runApp(MyApp());
 }
 
-class MainApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  final String baseUrl = 'http://172.28.69.20:5000';
+
+  Future<void> startVideo(String path) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/probeboogy.mp4'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'path': path,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Video started successfully');
+    } else {
+      print('Failed to start video: ${response.body}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Vertical Panels Example'),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Upmost Panel
-            Container(
-              padding: EdgeInsets.all(16.0),
-              color: Colors.blue,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Title',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16.0),
-                  Text(erste()), // Display text from erste() method
-                ],
-              ),
-            ),
-            // Middle Panel - Placeholder for Camera Feed
-            Expanded(
-              flex: 3,
-              child: Container(
-                color: Colors.green,
-                // Placeholder for the camera feed
-                child: Center(
-                  child: Text(
-                    'Camera Feed Placeholder',
-                    style: TextStyle(color: Colors.white, fontSize: 18.0),
-                  ),
-                ),
-              ),
-            ),
-            // Lowest Panel
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: EdgeInsets.all(16.0),
-                color: Colors.orange,
-                child: VelocityInformation(), // Display velocity information
-              ),
-            ),
-          ],
+        appBar: AppBar(title: Text('Start Video App')),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              startVideo('probeboogy.mp4'); // Change this to the actual path
+            },
+            child: Text('Start Video'),
+          ),
         ),
       ),
-    );
-  }
-}
-
-// Widget to display velocity information
-class VelocityInformation extends StatefulWidget {
-  @override
-  _VelocityInformationState createState() => _VelocityInformationState();
-}
-
-class _VelocityInformationState extends State<VelocityInformation> {
-  TextEditingController _velocityController = TextEditingController();
-  double _velocity = 20.0; // Default velocity
-
-  @override
-  void dispose() {
-    _velocityController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Velocity: $_velocity km/h', // Display current velocity
-          style: TextStyle(fontSize: 18.0),
-        ),
-        SizedBox(height: 16.0),
-        ElevatedButton(
-          onPressed: () {},
-          child: Text('Start Engine'),
-        ),
-        SizedBox(height: 16.0),
-        TextField(
-          controller: _velocityController,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: 'Enter Velocity',
-            border: OutlineInputBorder(),
-          ),
-          onChanged: (value) {
-            setState(() {
-              // Update velocity value dynamically based on user input
-              _velocity = double.tryParse(value) ?? _velocity;
-            });
-          },
-        ),
-      ],
     );
   }
 }
