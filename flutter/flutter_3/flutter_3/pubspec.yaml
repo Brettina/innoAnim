@@ -14,11 +14,15 @@ dependencies:
   #flutter_3d: ^0.4.1
   http: ^0.13.3
   webview_flutter: ^2.0.13 # Add the latest version of webview_flutter
-
+  path_provider: ^2.0.3
+  permission_handler: ^12.1.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_video_player: ^0.2.1
+
 
 flutter:
   uses-material-design: true
@@ -27,3 +31,5 @@ assets:
   - assets/image1.png
   - assets/image2.png
   - assets/undercarriage.stp
+  - assets/probeboogy.mp4
+  

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_blue/flutter_blue.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,9 +22,9 @@ class MyApp extends StatelessWidget {
     }
   }
 
-// Method to fetch the list of files from the server
+  // Method to fetch the list of files from the server
   Future<List<String>> fetchFileList() async {
-    final response = await http.get(Uri.parse('$ip:5000/list_files'));
+    final response = await http.get(Uri.parse('http://$ip:5000/list_files'));
     if (response.statusCode == 200) {
       // Parse the JSON response
       List<dynamic> fileList = jsonDecode(response.body);
@@ -87,6 +89,19 @@ class MyApp extends StatelessWidget {
     }
   }
 
+  void _scanDevices() async {
+    FlutterBlue flutterBlue = FlutterBlue.instance;
+    flutterBlue.scanResults.listen((List<ScanResult> results) {
+      // Do something with scan results
+      for (ScanResult result in results) {
+        print('${result.device.name} found! rssi: ${result.rssi}');
+      }
+    });
+
+    // Start scanning
+    flutterBlue.startScan(timeout: Duration(seconds: 4));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -117,6 +132,10 @@ class MyApp extends StatelessWidget {
                 },
               ),
               SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _scanDevices,
+                child: Text('Scan Devices'),
+              ),
               ElevatedButton(
                 onPressed: () {
                   startVideo('probeboogy.mp4');
