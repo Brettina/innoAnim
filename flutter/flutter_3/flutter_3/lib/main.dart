@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:video_player/video_player.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
+  //await Firebase.initializeApp(); //initilaize app - wirft error
   runApp(MyApp(cameras: cameras));
 }
 
@@ -18,45 +23,47 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: Text('Webcam and Video Player')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 240, // Fixed height for the camera feed panel
-                child: CameraFeedWidget(cameras: cameras),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Functionality removed for simplicity
-                  // startVideo('billoraeder einseitig.mp4');
-                },
-                child: Text('Start Video'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Functionality removed for simplicity
-                  // playVideo(context, 'billoraeder alle.mp4');
-                },
-                child: Text('Play Video'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Placeholder for button functionality
-                },
-                child: Text('Button 1'), // Empty button 1
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Placeholder for button functionality
-                },
-                child: Text('Button 2'), // Empty button 2
-              ),
-            ],
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 240, // Fixed height for the camera feed panel
+                  child: CameraFeedWidget(cameras: cameras),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Functionality removed for simplicity
+                    // startVideo('billoraeder einseitig.mp4');
+                  },
+                  child: Text('Start Video'),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Functionality removed for simplicity
+                    // playVideo(context, 'billoraeder alle.mp4');
+                  },
+                  child: Text('Play Video'),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Placeholder for button functionality
+                  },
+                  child: Text('Button 1'), // Empty button 1
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Placeholder for button functionality
+                  },
+                  child: Text('Button 2'), // Empty button 2
+                ),
+              ],
+            ),
           ),
         ),
       ),
