@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // Define the server address as a constant
-const String serverAddress = 'http://172.28.69.28:8080/';
+const String serverAddress = 'http://172.28.69.28:8080'; // Flask server address
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,9 +42,14 @@ class MyApp extends StatelessWidget {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    _launchURL('$serverAddress/lib/');
+                    _launchURL('$serverAddress/lib/index.html');
                   },
-                  child: Text('Open html video player'), // Button 2
+                  child: Text('Open HTML Video Player'),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _helloworld,
+                  child: Text('Start HelloWorld Method'),
                 ),
               ],
             ),
@@ -65,6 +72,25 @@ class MyApp extends StatelessWidget {
       await launch(url, forceSafariVC: false, forceWebView: false);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  void _helloworld() async {
+    try {
+      final url = Uri.parse('$serverAddress/hello_world');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('HelloWorld method executed successfully');
+      } else {
+        print('Failed to execute HelloWorld method: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error executing HelloWorld method: $e');
     }
   }
 }
@@ -114,8 +140,4 @@ class _CameraFeedWidgetState extends State<CameraFeedWidget> {
       },
     );
   }
-}
-
-Future<void> fetchAndDisplayFiles(BuildContext context) async {
-  // Implement your file fetching logic here
 }
