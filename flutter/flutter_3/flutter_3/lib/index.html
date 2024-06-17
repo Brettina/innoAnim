@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video and Image Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        header, footer {
+            background-color: #333;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+            width: 100%;
+        }
+        main {
+            padding: 1em;
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        p {
+            line-height: 1.6;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 1em;
+        }
+        img, video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        input[type="number"] {
+            padding: 5px 10px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+    </style>
+    <script>
+        // Define the server address as a variable
+        const serverAddress = 'http://172.28.69.28:8080';
+
+        // Function to set playback speed of the video
+        function setPlaybackSpeed() {
+            const video = document.getElementById('videoPlayer');
+            const speedInput = document.getElementById('speedInput');
+            if (video && speedInput) {
+                video.playbackRate = parseFloat(speedInput.value);
+            }
+        }
+
+        // Function to handle input change and set playback speed immediately
+        function handleSpeedChange() {
+            setPlaybackSpeed();
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Video and Image Viewer</h1>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Video Viewer</h2>
+        <p>This video will loop indefinitely.</p>
+        <video id="videoPlayer" controls autoplay loop muted>
+            <!-- Use the serverAddress variable to point to the video file -->
+            <source src="http://172.28.69.28:8080/assets/billoraeder_alle.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <!-- Input field for setting playback speed -->
+        <label for="speedInput">Playback Speed:</label>
+        <input type="number" id="speedInput" step="0.1" min="0.1" max="4" value="1.0" oninput="handleSpeedChange()">
+    </main>
+    <main>
+        <h2>Image Viewer</h2>
+        <p>This page demonstrates displaying an image hosted on a server.</p>
+        <!-- Use the serverAddress variable to point to the image file -->
+        <img src="http://172.28.69.28:8080/assets/image1.png" alt="Image 1">
+    </main>
+    <footer>
+        <p>&copy; 2024 My Website. All rights reserved.</p>
+    </footer>
+</body>
+</html>

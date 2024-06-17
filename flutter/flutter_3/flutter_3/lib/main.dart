@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+// Define the server address as a constant
+const String serverAddress = 'http://172.28.69.28:8080/';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
-  //await Firebase.initializeApp(); //initilaize app - wirft error
   runApp(MyApp(cameras: cameras));
 }
 
@@ -35,32 +33,16 @@ class MyApp extends StatelessWidget {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // Functionality removed for simplicity
-                    // startVideo('billoraeder einseitig.mp4');
+                    _launchImageInBrowser('$serverAddress/assets/image1.png');
                   },
-                  child: Text('Start Video'),
+                  child: Text('Picture from Server'),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // Functionality removed for simplicity
-                    // playVideo(context, 'billoraeder alle.mp4');
+                    _launchURL('$serverAddress/lib/');
                   },
-                  child: Text('Play Video'),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Placeholder for button functionality
-                  },
-                  child: Text('Button 1'), // Empty button 1
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Placeholder for button functionality
-                  },
-                  child: Text('Button 2'), // Empty button 2
+                  child: Text('Open html video player'), // Button 2
                 ),
               ],
             ),
@@ -68,6 +50,22 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _launchImageInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceSafariVC: false, forceWebView: false);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
 
@@ -116,4 +114,8 @@ class _CameraFeedWidgetState extends State<CameraFeedWidget> {
       },
     );
   }
+}
+
+Future<void> fetchAndDisplayFiles(BuildContext context) async {
+  // Implement your file fetching logic here
 }
