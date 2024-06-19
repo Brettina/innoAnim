@@ -1,58 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
 
 // Define the server address as a constant
 const String serverAddress = 'http://172.28.69.28:8080'; // Flask server address
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
-  runApp(MyApp(cameras: cameras));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final List<CameraDescription> cameras;
-
-  MyApp({required this.cameras});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text('Webcam and Video Player')),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 240, // Fixed height for the camera feed panel
-                  child: CameraFeedWidget(cameras: cameras),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _launchImageInBrowser('$serverAddress/assets/image1.png');
-                  },
-                  child: Text('Picture from Server'),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _launchURL('$serverAddress/lib/index.html');
-                  },
-                  child: Text('Open HTML Video Player'),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _helloworld,
-                  child: Text('Start HelloWorld Method'),
-                ),
-              ],
-            ),
+      home: MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  Uint8List? _image;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Webcam and Video Player')),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Commenting out the camera feed panel
+              // Container(
+              //   height: 240, // Fixed height for the camera feed panel
+              //   child: CameraFeedWidget(),
+              // ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  _launchImageInBrowser('$serverAddress/assets/image1.png');
+                },
+                child: Text('Picture from Server'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  _launchURL('$serverAddress/lib/index.html');
+                },
+                child: Text('Open HTML Video Player'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _helloworld,
+                child: Text('Start HelloWorld Method'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _processImage,
+                child: Text('Process Image with OpenCV'),
+              ),
+              SizedBox(height: 20),
+              _image != null ? Image.memory(_image!) : Container(),
+            ],
           ),
         ),
       ),
@@ -93,51 +110,41 @@ class MyApp extends StatelessWidget {
       print('Error executing HelloWorld method: $e');
     }
   }
-}
 
-class CameraFeedWidget extends StatefulWidget {
-  final List<CameraDescription> cameras;
+  void _processImage() async {
+    try {
+      final url = Uri.parse('$serverAddress/process_image');
 
-  const CameraFeedWidget({Key? key, required this.cameras}) : super(key: key);
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
 
-  @override
-  _CameraFeedWidgetState createState() => _CameraFeedWidgetState();
-}
-
-class _CameraFeedWidgetState extends State<CameraFeedWidget> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = CameraController(
-      widget.cameras[0], // Use the first available camera
-      ResolutionPreset.medium,
-    );
-    _initializeControllerFuture = _controller.initialize();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initializeControllerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: CameraPreview(_controller),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+      if (response.statusCode == 200) {
+        setState(() {
+          _image = response.bodyBytes;
+        });
+        print('Image processed successfully');
+      } else {
+        print('Failed to process image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error processing image: $e');
+    }
   }
 }
+
+// Commenting out the CameraFeedWidget class
+// class CameraFeedWidget extends StatefulWidget {
+//   @override
+//   _CameraFeedWidgetState createState() => _CameraFeedWidgetState();
+// }
+
+// class _CameraFeedWidgetState extends State<CameraFeedWidget> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: Text('Camera feed not available'),
+//     );
+//   }
+// }
