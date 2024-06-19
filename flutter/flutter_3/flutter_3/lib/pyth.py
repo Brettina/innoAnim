@@ -1,28 +1,40 @@
 from flask import Flask, send_file
 import cv2
-import numpy as np
-import os
+# this needs to run manually before starting anything,
+# because python scripts rely on server connection through flask
 
+#notwendig> python -m http.server 8080
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    # Your Python method here
-    print("Hello, world!")
-    return 'Hello, World!'
+@app.route("/hello_world")
+#def hello_world():
+  #  print("heasdfadfao rowlrd")
+  #  return "hellooooooo"
 
-@app.route('/process_image', methods=['POST'])
-def process_image():
-    # Generate a simple image with OpenCV
-    image = np.zeros((100, 200, 3), dtype=np.uint8)
-    cv2.putText(image, 'Hello, World!', (5, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+@app.route("/open_image")
+def open_image():
+    try:
+        # Replace this path with your image path
+        image_path = 'http://localhost:8080/pic1.jpg'
+        img = cv2.imread(image_path)
+        
+        # Example processing with OpenCV
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # Convert processed image to bytes
+        _, img_encoded = cv2.imencode('.jpg', gray)
+        
+        # Convert bytes to bytesio object
+        img_bytes = io.BytesIO(img_encoded)
+        
+        return send_file(img_bytes, mimetype='image/jpeg')
     
-    # Save the image
-    output_path = '/assets/pdv.png'
-    cv2.imwrite(output_path, image)
+    except Exception as e:
+        print(f"Error opening image: {e}")
+        return "Error opening image"
     
-    # Send the image file back to the client
-    return send_file(output_path, mimetype='image/png')
+
 
 if __name__ == '__main__':
-    app.run(port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080)
